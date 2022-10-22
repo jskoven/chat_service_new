@@ -71,6 +71,7 @@ func (cp *clientProfile) receiveMessage() {
 			log.Printf("Failed to receive message from server: %s", err)
 		}
 		fmt.Printf("%s : %v", messageReceived.Name, messageReceived.Body)
+		fmt.Println()
 
 	}
 }
