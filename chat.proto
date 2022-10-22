@@ -1,0 +1,19 @@
+syntax = "proto3";
+option go_package = "Dissys_mandatory_chat2/protoFiles";
+package chatServer;
+
+message FromClient{
+    string name = 1;
+    string body = 2;
+}
+
+message fromServer{
+    string name = 1;
+    string body = 2;
+}
+
+service Services{
+    rpc ChatService(stream FromClient) returns (stream fromServer){};
+}
+
+/* protoc --go_out=./protoFiles --go-grpc_out=./protoFiles chat.proto  */ 
