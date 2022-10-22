@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"github.com/jskoven/chat_service_new/protoFiles"
 )
 
 func main() {
