@@ -4,8 +4,9 @@ import (
 	"log"
 	"net"
 
+	"chatServer/protoFiles"
+
 	"google.golang.org/grpc"
-	"github.com/jskoven/chat_service_new/protoFiles"
 )
 
 func main() {
@@ -19,6 +20,9 @@ func main() {
 	log.Printf("Listening on port :9000")
 
 	grpcserver := grpc.NewServer()
+
+	server := protoFiles.ChatServer{}
+	protoFiles.RegisterServicesServer(grpcserver, &server)
 
 	err = grpcserver.Serve(listener)
 	if err != nil {

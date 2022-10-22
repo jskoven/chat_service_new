@@ -20,11 +20,12 @@ type messageHandler struct {
 
 var messageHandlerObject = messageHandler{}
 
-type chatServer struct {
+type ChatServer struct {
+	UnimplementedServicesServer
 }
 
 // Handles both receiving and sending messages
-func (s *chatServer) chatService(c Services_ChatServiceServer) error {
+func (s *ChatServer) ChatService(c Services_ChatServiceServer) error {
 	clientCode := rand.Int31n(10)
 	errorChannel := make(chan error)
 
@@ -53,8 +54,9 @@ func receiveFromStream(c Services_ChatServiceServer, clientCodeReceived int, err
 				messageCode: int(rand.Int31()),
 				clientCode:  clientCodeReceived,
 			})
-			messageHandlerObject.lock.Unlock()
 			log.Printf("%v", messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1])
+
+			messageHandlerObject.lock.Unlock()
 		}
 
 	}
@@ -62,10 +64,16 @@ func receiveFromStream(c Services_ChatServiceServer, clientCodeReceived int, err
 
 // Server sending received messages out to other clients
 func sendToStream(c Services_ChatServiceServer, clientCodeSent int, errorChannel chan error) {
+
 	for {
 
 		for {
 			messageHandlerObject.lock.Lock()
+
+			if len(messageHandlerObject.MessageSlice) == 0 {
+				messageHandlerObject.lock.Unlock()
+				break
+			}
 
 			senderCode := messageHandlerObject.MessageSlice[0].clientCode
 			senderName := messageHandlerObject.MessageSlice[0].clientName
