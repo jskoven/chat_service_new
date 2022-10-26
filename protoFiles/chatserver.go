@@ -64,7 +64,7 @@ func receiveFromStream(c Services_ChatServiceServer, clientCodeReceived int, err
 
 // Server sending received messages out to other clients
 func sendToStream(c Services_ChatServiceServer, clientCodeSent int, errorChannel chan error) {
-
+	var messageCode int
 	for {
 
 		for {
@@ -75,13 +75,13 @@ func sendToStream(c Services_ChatServiceServer, clientCodeSent int, errorChannel
 				break
 			}
 
-			senderCode := messageHandlerObject.MessageSlice[0].clientCode
-			senderName := messageHandlerObject.MessageSlice[0].clientName
-			senderMessage := messageHandlerObject.MessageSlice[0].messageBody
-
+			senderCode := messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1].clientCode
+			senderName := messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1].clientName
+			senderMessage := messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1].messageBody
 			messageHandlerObject.lock.Unlock()
 
-			if senderCode != clientCodeSent {
+			if senderCode != clientCodeSent && messageCode != messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1].messageCode {
+				messageCode = messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1].messageCode
 				err := c.Send(&FromServer{
 					Name: senderName,
 					Body: senderMessage,
@@ -90,7 +90,7 @@ func sendToStream(c Services_ChatServiceServer, clientCodeSent int, errorChannel
 					errorChannel <- err
 				}
 
-				messageHandlerObject.lock.Lock()
+				/*messageHandlerObject.lock.Lock()
 
 				if len(messageHandlerObject.MessageSlice) > 1 {
 					// The ":1" specifies that the slice should be the same
@@ -100,7 +100,7 @@ func sendToStream(c Services_ChatServiceServer, clientCodeSent int, errorChannel
 				} else {
 					messageHandlerObject.MessageSlice = []messageStruct{}
 				}
-				messageHandlerObject.lock.Unlock()
+				messageHandlerObject.lock.Unlock()*/
 			}
 
 		}
