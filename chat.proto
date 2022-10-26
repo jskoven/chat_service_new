@@ -5,11 +5,13 @@ package chatServer;
 message FromClient{
     string name = 1;
     string body = 2;
+    int32 lamport = 3;
 }
 
 message fromServer{
     string name = 1;
     string body = 2;
+    int32 lamport = 3;
 }
 
 service Services{

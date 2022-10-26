@@ -11,6 +11,7 @@ type messageStruct struct {
 	messageBody string
 	messageCode int
 	clientCode  int
+	lamport     int
 }
 
 type messageHandler struct {
@@ -53,6 +54,7 @@ func receiveFromStream(c Services_ChatServiceServer, clientCodeReceived int, err
 				messageBody: message.Body,
 				messageCode: int(rand.Int31()),
 				clientCode:  clientCodeReceived,
+				lamport:     int(message.Lamport),
 			})
 			log.Printf("%v", messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1])
 
@@ -82,9 +84,12 @@ func sendToStream(c Services_ChatServiceServer, clientCodeSent int, errorChannel
 
 			if senderCode != clientCodeSent && messageCode != messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1].messageCode {
 				messageCode = messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1].messageCode
+				senderLamport := messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1].lamport
+
 				err := c.Send(&FromServer{
-					Name: senderName,
-					Body: senderMessage,
+					Name:    senderName,
+					Body:    senderMessage,
+					Lamport: int32(senderLamport),
 				})
 				if err != nil {
 					errorChannel <- err
