@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
+	"time"
 
 	"google.golang.org/grpc"
 )
@@ -26,7 +28,7 @@ func main() {
 		log.Printf("Failed to create stream to chatService: %s", err)
 	}
 
-	clientProfile := clientProfile{stream: stream}
+	clientProfile := clientProfile{stream: stream, connection: *conn}
 	startScreen()
 	clientProfile.chooseUserName()
 	go clientProfile.receiveMessage()
@@ -39,6 +41,7 @@ func main() {
 type clientProfile struct {
 	stream     protoFiles.Services_ChatServiceClient
 	clientName string
+	connection grpc.ClientConn
 }
 
 func (cp *clientProfile) chooseUserName() {
@@ -46,6 +49,8 @@ func (cp *clientProfile) chooseUserName() {
 	fmt.Println("Choose your username: ")
 	Scanner.Scan()
 	cp.clientName = Scanner.Text()
+	cp.joinChatService()
+
 }
 
 func (cp *clientProfile) sendMessage() {
@@ -54,6 +59,19 @@ func (cp *clientProfile) sendMessage() {
 		Scanner := bufio.NewScanner(os.Stdin)
 		Scanner.Scan()
 		MessageToBeSent := Scanner.Text()
+		if strings.ToLower(MessageToBeSent) == "exit" {
+
+			MessageFromClient := &protoFiles.FromClient{
+				Name: cp.clientName,
+				Body: "-- has left the chat --",
+			}
+			err := cp.stream.Send(MessageFromClient)
+			if err != nil {
+				log.Printf("Failed to send exit-message to server: %s", err)
+			}
+			time.Sleep(1 * time.Second)
+			cp.exitChatService()
+		}
 		MessageFromClient := &protoFiles.FromClient{
 			Name: cp.clientName,
 			Body: MessageToBeSent,
@@ -74,6 +92,22 @@ func (cp *clientProfile) receiveMessage() {
 		fmt.Printf("%s : %v", messageReceived.Name, messageReceived.Body)
 		fmt.Println()
 
+	}
+}
+
+func (cp *clientProfile) exitChatService() {
+	cp.connection.Close()
+	os.Exit(0)
+}
+
+func (cp *clientProfile) joinChatService() {
+	MessageFromClient := &protoFiles.FromClient{
+		Name: cp.clientName,
+		Body: "-- has joined the chat --",
+	}
+	err := cp.stream.Send(MessageFromClient)
+	if err != nil {
+		log.Printf("Failed to send join-message: %s", err)
 	}
 }
 
