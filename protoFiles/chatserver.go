@@ -56,9 +56,10 @@ func receiveFromStream(c Services_ChatServiceServer, clientCodeReceived int, err
 				clientCode:  clientCodeReceived,
 				lamport:     int(message.Lamport),
 			})
-			log.Printf("%v", messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1])
-
+			lastMessage := messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1]
+			log.Printf("Broadcasting message from %s. Messagebody: %s. Messagecode: %d. Clientcode: %d. Lamport: %d", lastMessage.clientName, lastMessage.messageBody, lastMessage.messageCode, lastMessage.clientCode, lastMessage.lamport)
 			messageHandlerObject.lock.Unlock()
+
 		}
 
 	}
@@ -95,17 +96,6 @@ func sendToStream(c Services_ChatServiceServer, clientCodeSent int, errorChannel
 					errorChannel <- err
 				}
 
-				/*messageHandlerObject.lock.Lock()
-
-				if len(messageHandlerObject.MessageSlice) > 1 {
-					// The ":1" specifies that the slice should be the same
-					//slice, but with only the values of lower bound index 1
-					//hence, practically deleting the message at index 0.
-					messageHandlerObject.MessageSlice = messageHandlerObject.MessageSlice[1:]
-				} else {
-					messageHandlerObject.MessageSlice = []messageStruct{}
-				}
-				messageHandlerObject.lock.Unlock()*/
 			}
 
 		}

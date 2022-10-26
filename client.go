@@ -17,7 +17,8 @@ import (
 var clientLamport = 0
 
 func main() {
-
+	f, err := os.OpenFile("logs.txt", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	log.SetOutput(f)
 	conn, err := grpc.Dial(":9000", grpc.WithInsecure())
 	if err != nil {
 		log.Printf("Failed to dial server on port 9000: %s", err)
@@ -50,6 +51,7 @@ type clientProfile struct {
 
 func (cp *clientProfile) chooseUserName() {
 	Scanner := bufio.NewScanner(os.Stdin)
+	fmt.Println("To exit the chat service, simply type: exit")
 	fmt.Println("Choose your username: ")
 	Scanner.Scan()
 	cp.clientName = Scanner.Text()
@@ -101,13 +103,14 @@ func (cp *clientProfile) receiveMessage() {
 		if err != nil {
 			log.Printf("Failed to receive message from server: %s", err)
 		}
-		fmt.Printf("#Lamport time %d#%s : %v", cp.lamportTime, messageReceived.Name, messageReceived.Body)
+		fmt.Printf("## Lamport time %d ##   %s : %v", cp.lamportTime, messageReceived.Name, messageReceived.Body)
 		fmt.Println()
 
 	}
 }
 
 func (cp *clientProfile) exitChatService() {
+	log.Printf("User has exited with username: %s", cp.clientName)
 	cp.connection.Close()
 	os.Exit(0)
 }
@@ -117,6 +120,7 @@ func (cp *clientProfile) joinChatService() {
 		Name: cp.clientName,
 		Body: "-- has joined the chat --",
 	}
+	log.Printf("User has connected with username: %s", cp.clientName)
 	err := cp.stream.Send(MessageFromClient)
 	if err != nil {
 		log.Printf("Failed to send join-message: %s", err)
