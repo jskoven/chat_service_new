@@ -26,7 +26,7 @@ type ChatServer struct {
 
 // Handles both receiving and sending messages
 func (s *ChatServer) ChatService(c Services_ChatServiceServer) error {
-	clientCode := rand.Int31n(10)
+	clientCode := int(rand.Int31())
 	errorChannel := make(chan error)
 
 	//receive message
