@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"strings"
 	"time"
@@ -13,8 +14,11 @@ import (
 	"google.golang.org/grpc"
 )
 
-func main() {
+var clientLamport = 0
 
+func main() {
+	f, err := os.OpenFile("logs.txt", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	log.SetOutput(f)
 	conn, err := grpc.Dial(":9000", grpc.WithInsecure())
 	if err != nil {
 		log.Printf("Failed to dial server on port 9000: %s", err)
@@ -39,13 +43,15 @@ func main() {
 }
 
 type clientProfile struct {
-	stream     protoFiles.Services_ChatServiceClient
-	clientName string
-	connection grpc.ClientConn
+	stream      protoFiles.Services_ChatServiceClient
+	clientName  string
+	connection  grpc.ClientConn
+	lamportTime int32
 }
 
 func (cp *clientProfile) chooseUserName() {
 	Scanner := bufio.NewScanner(os.Stdin)
+	fmt.Println("To exit the chat service, simply type: exit")
 	fmt.Println("Choose your username: ")
 	Scanner.Scan()
 	cp.clientName = Scanner.Text()
@@ -54,11 +60,16 @@ func (cp *clientProfile) chooseUserName() {
 }
 
 func (cp *clientProfile) sendMessage() {
-
 	for {
+
 		Scanner := bufio.NewScanner(os.Stdin)
 		Scanner.Scan()
 		MessageToBeSent := Scanner.Text()
+		if MessageToBeSent == "myLamport" {
+			fmt.Printf("Current lamport: %d", cp.lamportTime)
+			continue
+		}
+		cp.lamportTime++
 		if strings.ToLower(MessageToBeSent) == "exit" {
 
 			MessageFromClient := &protoFiles.FromClient{
@@ -73,8 +84,9 @@ func (cp *clientProfile) sendMessage() {
 			cp.exitChatService()
 		}
 		MessageFromClient := &protoFiles.FromClient{
-			Name: cp.clientName,
-			Body: MessageToBeSent,
+			Name:    cp.clientName,
+			Body:    MessageToBeSent,
+			Lamport: cp.lamportTime,
 		}
 		err := cp.stream.Send(MessageFromClient)
 		if err != nil {
@@ -86,16 +98,19 @@ func (cp *clientProfile) sendMessage() {
 func (cp *clientProfile) receiveMessage() {
 	for {
 		messageReceived, err := cp.stream.Recv()
+		cp.lamportTime = int32(math.Max(float64(cp.lamportTime), float64(messageReceived.Lamport)))
+		cp.lamportTime = cp.lamportTime + 1
 		if err != nil {
 			log.Printf("Failed to receive message from server: %s", err)
 		}
-		fmt.Printf("%s : %v", messageReceived.Name, messageReceived.Body)
+		fmt.Printf("## Lamport time %d ##   %s : %v", cp.lamportTime, messageReceived.Name, messageReceived.Body)
 		fmt.Println()
 
 	}
 }
 
 func (cp *clientProfile) exitChatService() {
+	log.Printf("User has exited with username: %s", cp.clientName)
 	cp.connection.Close()
 	os.Exit(0)
 }
@@ -105,6 +120,7 @@ func (cp *clientProfile) joinChatService() {
 		Name: cp.clientName,
 		Body: "-- has joined the chat --",
 	}
+	log.Printf("User has connected with username: %s", cp.clientName)
 	err := cp.stream.Send(MessageFromClient)
 	if err != nil {
 		log.Printf("Failed to send join-message: %s", err)

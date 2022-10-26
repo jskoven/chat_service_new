@@ -1,0 +1,41 @@
+2022/10/26 14:36:27 
+2022/10/26 14:36:27 
+2022/10/26 14:36:27 ### Logs for chat session started at: 2022-10-26 14:36:27.812054 +0200 CEST m=+0.006327401 ###
+2022/10/26 14:36:27 Starting server...
+2022/10/26 14:36:27 Listening on port :9000
+2022/10/26 14:36:36 User has connected with username: Jens
+2022/10/26 14:36:36 Broadcasting message from Jens. Messagebody: -- has joined the chat --. Messagecode: 1427131847. Clientcode: 1298498081. Lamport: 0
+2022/10/26 14:36:38 User has connected with username: Peter
+2022/10/26 14:36:38 Broadcasting message from Peter. Messagebody: -- has joined the chat --. Messagecode: 939984059. Clientcode: 2019727887. Lamport: 0
+2022/10/26 14:36:40 Broadcasting message from Jens. Messagebody: Hey Peter. Messagecode: 911902081. Clientcode: 1298498081. Lamport: 2
+2022/10/26 14:36:43 Broadcasting message from Peter. Messagebody: Hey Jens. Messagecode: 1474941318. Clientcode: 2019727887. Lamport: 4
+2022/10/26 14:36:51 User has connected with username: Ole
+2022/10/26 14:36:51 Broadcasting message from Ole. Messagebody: -- has joined the chat --. Messagecode: 336122540. Clientcode: 140954425. Lamport: 0
+2022/10/26 14:36:53 Broadcasting message from Ole. Messagebody: Hey gutter. Messagecode: 208240456. Clientcode: 140954425. Lamport: 6
+2022/10/26 14:36:55 Broadcasting message from Jens. Messagebody: Hej Ole. Messagecode: 646203300. Clientcode: 1298498081. Lamport: 8
+2022/10/26 14:36:59 Broadcasting message from Jens. Messagebody: Jeg smutter nu, farvel. Messagecode: 1106410694. Clientcode: 1298498081. Lamport: 9
+2022/10/26 14:37:00 Broadcasting message from Jens. Messagebody: -- has left the chat --. Messagecode: 1747278511. Clientcode: 1298498081. Lamport: 0
+2022/10/26 14:37:01 User has exited with username: Jens
+2022/10/26 14:37:01 Failed to receive message from client, error: rpc error: code = Canceled desc = context canceled
+2022/10/26 14:37:01 Failed to receive message from client, error: rpc error: code = Canceled desc = context canceled
+2022/10/26 14:37:04 Broadcasting message from Peter. Messagebody: Mig ogs!. Messagecode: 460128162. Clientcode: 2019727887. Lamport: 12
+2022/10/26 14:37:07 Broadcasting message from Peter. Messagebody: -- has left the chat --. Messagecode: 817455089. Clientcode: 2019727887. Lamport: 0
+2022/10/26 14:37:08 User has exited with username: Peter
+2022/10/26 14:37:08 Failed to receive message from client, error: rpc error: code = Canceled desc = context canceled
+2022/10/26 14:37:08 Failed to receive message from client, error: rpc error: code = Canceled desc = context canceled
+2022/10/26 14:37:09 Broadcasting message from Ole. Messagebody: -- has left the chat --. Messagecode: 683024728. Clientcode: 140954425. Lamport: 0
+2022/10/26 14:37:11 User has exited with username: Ole
+2022/10/26 14:37:11 Failed to receive message from client, error: rpc error: code = Canceled desc = context canceled
+2022/10/26 14:37:11 Failed to receive message from client, error: rpc error: code = Canceled desc = context canceled
+2022/10/26 14:38:39 
+2022/10/26 14:38:39 
+2022/10/26 14:38:39 ### Logs for chat session started at: 2022-10-26 14:38:39.9453263 +0200 CEST m=+0.006349201 ###
+2022/10/26 14:38:39 Starting server...
+2022/10/26 14:38:39 Listening on port :9000
+2022/10/26 14:38:52 User has connected with username: jens
+2022/10/26 14:38:52 Broadcasting message from jens. Messagebody: -- has joined the chat --. Messagecode: 2019727887. Clientcode: 1298498081. Lamport: 0
+2022/10/26 14:38:55 Broadcasting message from jens. Messagebody: Øv der er ingen her. Messagecode: 1427131847. Clientcode: 1298498081. Lamport: 1
+2022/10/26 14:38:57 Broadcasting message from jens. Messagebody: -- has left the chat --. Messagecode: 939984059. Clientcode: 1298498081. Lamport: 0
+2022/10/26 14:38:58 User has exited with username: jens
+2022/10/26 14:38:58 Failed to receive message from client, error: rpc error: code = Canceled desc = context canceled
+2022/10/26 14:38:58 Failed to receive message from client, error: rpc error: code = Canceled desc = context canceled

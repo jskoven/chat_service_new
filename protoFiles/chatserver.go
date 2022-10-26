@@ -11,6 +11,7 @@ type messageStruct struct {
 	messageBody string
 	messageCode int
 	clientCode  int
+	lamport     int
 }
 
 type messageHandler struct {
@@ -53,10 +54,12 @@ func receiveFromStream(c Services_ChatServiceServer, clientCodeReceived int, err
 				messageBody: message.Body,
 				messageCode: int(rand.Int31()),
 				clientCode:  clientCodeReceived,
+				lamport:     int(message.Lamport),
 			})
-			log.Printf("%v", messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1])
-
+			lastMessage := messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1]
+			log.Printf("Broadcasting message from %s. Messagebody: %s. Messagecode: %d. Clientcode: %d. Lamport: %d", lastMessage.clientName, lastMessage.messageBody, lastMessage.messageCode, lastMessage.clientCode, lastMessage.lamport)
 			messageHandlerObject.lock.Unlock()
+
 		}
 
 	}
@@ -82,25 +85,17 @@ func sendToStream(c Services_ChatServiceServer, clientCodeSent int, errorChannel
 
 			if senderCode != clientCodeSent && messageCode != messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1].messageCode {
 				messageCode = messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1].messageCode
+				senderLamport := messageHandlerObject.MessageSlice[len(messageHandlerObject.MessageSlice)-1].lamport
+
 				err := c.Send(&FromServer{
-					Name: senderName,
-					Body: senderMessage,
+					Name:    senderName,
+					Body:    senderMessage,
+					Lamport: int32(senderLamport),
 				})
 				if err != nil {
 					errorChannel <- err
 				}
 
-				/*messageHandlerObject.lock.Lock()
-
-				if len(messageHandlerObject.MessageSlice) > 1 {
-					// The ":1" specifies that the slice should be the same
-					//slice, but with only the values of lower bound index 1
-					//hence, practically deleting the message at index 0.
-					messageHandlerObject.MessageSlice = messageHandlerObject.MessageSlice[1:]
-				} else {
-					messageHandlerObject.MessageSlice = []messageStruct{}
-				}
-				messageHandlerObject.lock.Unlock()*/
 			}
 
 		}
